@@ -17,6 +17,10 @@ final class ShortcutFileTests: XCTestCase {
 
     override func tearDownWithError() throws {
         defaults.removePersistentDomain(forName: suiteName)
+        // removePersistentDomain leaves an empty plist behind; delete it too.
+        let plist = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Preferences/\(suiteName).plist")
+        try? FileManager.default.removeItem(at: plist)
         defaults = nil
         store = nil
     }
