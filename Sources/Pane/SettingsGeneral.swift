@@ -56,7 +56,7 @@ final class GeneralPreferencesViewController: NSViewController {
         form.separator()
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "dev"
         form.row("Version:", label(version))
-        form.row(nil, wrappingNote("To update, run scripts/update.sh in the Pane folder. New versions are published to the private GitHub repo.", width: width))
+        form.row(nil, wrappingNote("New versions are published on GitHub. Download the latest DMG from github.com/karunpai/Pane/releases and replace Pane in Applications.", width: width))
 
         let help = NSButton(title: "", target: self, action: #selector(showHelp))
         help.bezelStyle = .helpButton

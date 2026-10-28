@@ -49,7 +49,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>LSApplicationCategoryType</key><string>public.app-category.productivity</string>
   <key>LSUIElement</key><true/>
   <key>NSHighResolutionCapable</key><true/>
-  <key>NSHumanReadableCopyright</key><string>Copyright © $YEAR Karun Pai. All rights reserved.</string>
+  <key>NSHumanReadableCopyright</key><string>Copyright © $YEAR Karun Pai. Released under the MIT License.</string>
   <key>NSAccessibilityUsageDescription</key><string>Pane uses Accessibility to move and resize the window you select.</string>
   <key>CFBundleDocumentTypes</key>
   <array>
@@ -99,6 +99,20 @@ codesign --verify --strict "$APP"
 
 ditto -c -k --sequesterRsrc --keepParent "$APP" "$ARCHIVE"
 
+# Disk image: Pane.app next to an Applications shortcut, for drag-to-install.
+DMG="$ROOT/build/Pane-$VERSION.dmg"
+DMG_STAGE="$(mktemp -d)"
+ditto "$APP" "$DMG_STAGE/Pane.app"
+ln -s /Applications "$DMG_STAGE/Applications"
+cp "$ROOT/LICENSE" "$DMG_STAGE/LICENSE.txt"
+rm -f "$DMG"
+hdiutil create -quiet -volname "Pane $VERSION" -srcfolder "$DMG_STAGE" -fs HFS+ -format UDZO -ov "$DMG"
+rm -rf "$DMG_STAGE"
+if security find-identity -p codesigning 2>/dev/null | grep -qF "\"$SIGNING_IDENTITY\""; then
+  codesign --force --sign "$SIGNING_IDENTITY" "$DMG"
+fi
+
 echo "==> Built $APP"
 echo "    $(lipo -archs "$APP/Contents/MacOS/Pane")  •  version $VERSION ($BUILD_NUMBER)"
 echo "==> Packaged $ARCHIVE"
+echo "==> Packaged $DMG"

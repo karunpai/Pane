@@ -16,13 +16,22 @@ Drag across the cells and the window snaps there; a live preview shows where it 
 
 Screenshots are rendered by the app itself: `build/Pane.app/Contents/MacOS/Pane --snapshot-overlay docs/screenshots` (the overlay renders show a flat backdrop because the live blur can't be captured offscreen).
 
-## Install
+## Download and install
+
+1. Download the latest **Pane-x.y.z.dmg** from [Releases](../../releases/latest).
+2. Open the DMG and drag **Pane** onto **Applications**.
+3. Open Pane from Applications. The first time, macOS may say it can't verify the developer: open **System Settings → Privacy & Security**, scroll down and click **Open Anyway** (or right-click Pane in Applications and choose **Open**). This is needed once, because Pane isn't notarized by Apple yet.
+4. Turn on Pane in **System Settings → Privacy & Security → Accessibility** when asked, so it can move windows.
+
+Requires a Mac with Apple silicon (M1 or later) and macOS 13 or later.
+
+## Build from source
 
 ```sh
 scripts/install.sh
 ```
 
-This builds a release arm64 app, quits any running Pane, installs `/Applications/Pane.app`, and launches it.
+This builds a release arm64 app, quits any running Pane, installs `/Applications/Pane.app`, and launches it. From an automated or sandboxed shell, use `scripts/install.sh --no-launch` and open Pane yourself: macOS checks Accessibility against whoever launched the app.
 
 ### First run: Accessibility permission
 
@@ -44,16 +53,16 @@ After the first signed install, grant Accessibility once more. From then on, upd
 scripts/update.sh
 ```
 
-Runs `git pull` and then `scripts/install.sh`. The GitHub repo is private, so Pane can't check for updates by itself. Use this script to update.
+Runs `git pull` and then `scripts/install.sh`. If you installed from a DMG, download the newest DMG from Releases and replace Pane in Applications.
 
 ## Release
 
 1. Bump the version in `VERSION` (for example `1.1.0`) and commit.
 2. Run `scripts/release.sh`.
 
-The script refuses to run with uncommitted changes. It builds `build/Pane-<version>-arm64.zip`, tags `v<version>`, pushes the tag, and creates a GitHub release with generated notes. The build number (`CFBundleVersion`) is the git commit count.
+The script refuses to run with uncommitted changes. It builds `build/Pane-<version>.dmg` and `build/Pane-<version>-arm64.zip`, tags `v<version>`, pushes the tag, and creates a GitHub release with generated notes. The build number (`CFBundleVersion`) is the git commit count.
 
-To build without installing, run `scripts/build-app.sh`. It produces `build/Pane.app` and `build/Pane-<version>-arm64.zip`.
+To build without installing, run `scripts/build-app.sh`. It produces `build/Pane.app`, `build/Pane-<version>.dmg` and `build/Pane-<version>-arm64.zip`.
 
 ## Sharing shortcuts
 
@@ -76,3 +85,7 @@ DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcrun swift test --arch
 Tests use temporary `UserDefaults` suites and never touch your real shortcuts. `DEVELOPER_DIR` is needed only if `xcode-select` points at the Command Line Tools, which lack XCTest.
 
 The internal bundle identifier is `com.karunpai.Pane` and the executable is `Pane`. Don't change either: your preferences and Accessibility permission are tied to them.
+
+## License
+
+Pane is released under the [MIT License](LICENSE). Copyright © 2026 Karun Pai.

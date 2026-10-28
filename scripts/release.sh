@@ -1,5 +1,5 @@
 #!/bin/zsh
-# Tags the current commit as v<VERSION>, builds, and publishes a GitHub release with the zip.
+# Tags the current commit as v<VERSION>, builds, and publishes a GitHub release with the DMG and zip.
 # Bump VERSION and commit before running.
 set -euo pipefail
 
@@ -14,6 +14,7 @@ fi
 VERSION="$(tr -d '[:space:]' < VERSION)"
 TAG="v$VERSION"
 ZIP="build/Pane-$VERSION-arm64.zip"
+DMG="build/Pane-$VERSION.dmg"
 
 if git rev-parse -q --verify "refs/tags/$TAG" >/dev/null; then
   echo "error: tag $TAG already exists; bump VERSION first" >&2
@@ -24,5 +25,5 @@ fi
 
 git tag -a "$TAG" -m "Pane $VERSION"
 git push origin "$TAG"
-gh release create "$TAG" "$ZIP" --title "Pane $VERSION" --generate-notes
+gh release create "$TAG" "$DMG" "$ZIP" --title "Pane $VERSION" --generate-notes
 echo "==> Released Pane $VERSION"
