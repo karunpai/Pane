@@ -45,25 +45,44 @@ enum OverlaySnapshot {
         overlay.layoutSubtreeIfNeeded()
         if !write(backdrop, to: directory.appendingPathComponent("overlay-fine-grid.png")) { status = 1 }
 
-        // Each Settings tab, rendered from the window's frame view so the
+        // Each Settings tab in dark and light, rendered from the window's frame view so the
         // background and toolbar are included.
         let settings = SettingsWindowController()
         if let window = settings.window, let tabs = window.contentViewController as? NSTabViewController {
-            window.appearance = NSAppearance(named: .darkAqua)
             window.setFrameOrigin(NSPoint(x: -20_000, y: -20_000))
             window.orderFrontRegardless()
-            for (index, name) in ["general", "appearance", "shortcuts"].enumerated() {
-                tabs.selectedTabViewItemIndex = index
-                window.layoutIfNeeded()
-                window.displayIfNeeded()
-                RunLoop.current.run(until: Date().addingTimeInterval(0.4))
-                window.display()
-                if let frameView = window.contentView?.superview,
-                   !write(frameView, to: directory.appendingPathComponent("settings-\(name).png"), appearance: nil) {
-                    status = 1
+            for (appearance, suffix) in [(NSAppearance.Name.darkAqua, ""), (.aqua, "-light")] {
+                window.appearance = NSAppearance(named: appearance)
+                for (index, name) in ["general", "appearance", "shortcuts"].enumerated() {
+                    tabs.selectedTabViewItemIndex = index
+                    RunLoop.current.run(until: Date().addingTimeInterval(0.6))
+                    window.layoutIfNeeded()
+                    window.display()
+                    if let frameView = window.contentView?.superview,
+                       !write(frameView, to: directory.appendingPathComponent("settings-\(name)\(suffix).png"), appearance: nil) {
+                        status = 1
+                    }
                 }
             }
             window.orderOut(nil)
+        }
+
+        // The New/Edit Shortcut sheet (drawn as a titled window; as a sheet it has no title bar).
+        if let editor = SettingsWindowController.makeEditorWindowForSnapshot() {
+            editor.setFrameOrigin(NSPoint(x: -20_000, y: -20_000))
+            editor.orderFrontRegardless()
+            editor.makeFirstResponder(nil)
+            for (appearance, suffix) in [(NSAppearance.Name.darkAqua, ""), (.aqua, "-light")] {
+                editor.appearance = NSAppearance(named: appearance)
+                RunLoop.current.run(until: Date().addingTimeInterval(0.3))
+                editor.layoutIfNeeded()
+                editor.display()
+                if let content = editor.contentView?.superview,
+                   !write(content, to: directory.appendingPathComponent("settings-editor\(suffix).png"), appearance: nil) {
+                    status = 1
+                }
+            }
+            editor.orderOut(nil)
         }
         return status
     }

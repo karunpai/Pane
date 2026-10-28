@@ -26,5 +26,11 @@ rm -rf "$DEST"
 ditto "$ROOT/build/Pane.app" "$DEST"
 /System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -f "$DEST" >/dev/null 2>&1 || true
 
-echo "==> Launching Pane"
-open "$DEST"
+# Pass --no-launch when running from an automated or sandboxed shell: macOS
+# attributes Accessibility to whoever launches the app, so open Pane yourself.
+if [[ "${1:-}" == "--no-launch" ]]; then
+  echo "==> Installed. Open Pane from Applications to start it."
+else
+  echo "==> Launching Pane"
+  open "$DEST"
+fi

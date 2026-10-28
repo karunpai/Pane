@@ -308,12 +308,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     @objc private func openSettings() {
         if settings == nil {
             settings = SettingsWindowController()
-            let accessory = NSTitlebarAccessoryViewController()
-            let button = NSButton(title: "Accessibility…", target: self, action: #selector(showAccessibilityStatus))
-            button.sizeToFit()
-            accessory.view = button
-            accessory.layoutAttribute = .right
-            settings?.window?.addTitlebarAccessoryViewController(accessory)
         }
         NSApp.activate(ignoringOtherApps: true)
         settings?.showWindow(nil)
