@@ -1,0 +1,78 @@
+# Pane
+
+Pane is a native Apple Silicon window manager for macOS 13+. Open the grid from the menu bar or a global shortcut, drag across cells, and the frontmost window snaps to that area. Save placements as global keyboard shortcuts.
+
+## Screenshots
+
+| The grid | Finer grid (press ⌥ Option) | Grid settings (gear) |
+|---|---|---|
+| ![Grid overlay](docs/screenshots/overlay-front.png) | ![Finer 2× grid](docs/screenshots/overlay-fine-grid.png) | ![Grid settings](docs/screenshots/overlay-back.png) |
+
+Drag across the cells and the window snaps there; a live preview shows where it will land. Press **Option** to switch to a grid twice as fine, and again to switch back. **Esc** closes the panel. **⌘ =** / **⌘ −** change rows; add **Shift** for columns.
+
+| Shortcuts | General | Appearance |
+|---|---|---|
+| ![Shortcuts settings](docs/screenshots/settings-shortcuts.png) | ![General settings](docs/screenshots/settings-general.png) | ![Appearance settings](docs/screenshots/settings-appearance.png) |
+
+Screenshots are rendered by the app itself: `build/Pane.app/Contents/MacOS/Pane --snapshot-overlay docs/screenshots` (the overlay renders show a flat backdrop because the live blur can't be captured offscreen).
+
+## Install
+
+```sh
+scripts/install.sh
+```
+
+This builds a release arm64 app, quits any running Pane, installs `/Applications/Pane.app`, and launches it.
+
+### First run: Accessibility permission
+
+Pane moves other apps' windows, so macOS requires Accessibility access. When prompted, open **System Settings → Privacy & Security → Accessibility** and turn on Pane. The menu-bar icon's right-click menu shows the current status and has a recovery helper.
+
+### One-time: signing certificate (recommended)
+
+```sh
+scripts/create-signing-cert.sh
+```
+
+macOS ties the Accessibility permission to the app's code signature. Without a stable signing identity each build is signed ad-hoc and looks like a new app, so you'd have to re-grant Accessibility after every update. This script creates a self-signed **Pane Local Signing** certificate in your login keychain (valid 10 years). `build-app.sh` uses it automatically when present. It's safe to re-run. Keychain Access lists the certificate as "not trusted"; that's expected and doesn't matter for local signing.
+
+After the first signed install, grant Accessibility once more. From then on, updates keep it.
+
+## Update
+
+```sh
+scripts/update.sh
+```
+
+Runs `git pull` and then `scripts/install.sh`. The GitHub repo is private, so Pane can't check for updates by itself. Use this script to update.
+
+## Release
+
+1. Bump the version in `VERSION` (for example `1.1.0`) and commit.
+2. Run `scripts/release.sh`.
+
+The script refuses to run with uncommitted changes. It builds `build/Pane-<version>-arm64.zip`, tags `v<version>`, pushes the tag, and creates a GitHub release with generated notes. The build number (`CFBundleVersion`) is the git commit count.
+
+To build without installing, run `scripts/build-app.sh`. It produces `build/Pane.app` and `build/Pane-<version>-arm64.zip`.
+
+## Sharing shortcuts
+
+Your shortcuts live only in your own preferences. They aren't built into the app, so a fresh install starts with no shortcuts.
+
+- **Export:** Settings → Shortcuts → **Export…** saves a `My Pane Shortcuts.paneshortcuts` file you can send to someone.
+- **Import:** Settings → Shortcuts → **Import…**, or just double-click a `.paneshortcuts` file in Finder. Pane asks whether to:
+  - **Merge:** add the shortcuts to yours and skip ones you already have. If an imported shortcut uses keys that are already taken, it's added disabled, and Pane lists those shortcuts so you can give them new keys.
+  - **Replace:** swap your whole list for the file's shortcuts.
+
+A file that can't be read never changes your existing shortcuts. Older plain-JSON exports can still be imported.
+
+## Development
+
+```sh
+swift build --arch arm64
+DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer xcrun swift test --arch arm64
+```
+
+Tests use temporary `UserDefaults` suites and never touch your real shortcuts. `DEVELOPER_DIR` is needed only if `xcode-select` points at the Command Line Tools, which lack XCTest.
+
+The internal bundle identifier is `com.karunpai.Pane` and the executable is `Pane`. Don't change either: your preferences and Accessibility permission are tied to them.

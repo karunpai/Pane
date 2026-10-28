@@ -1,0 +1,7 @@
+.build/
+.build-*/
+build/
+*.zip
+.DS_Store
+*.paneshortcuts
+*.paneshortcuts.json
