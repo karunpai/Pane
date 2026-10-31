@@ -8,8 +8,9 @@ final class DisplayLayoutStoreTests: XCTestCase {
     private var store: DisplayLayoutStore!
 
     override func setUpWithError() throws {
-        suiteName = "PaneDisplayLayoutTests.\(UUID().uuidString)"
+        suiteName = "com.karunpai.Pane.PaneDisplayLayoutTests"
         defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
+        defaults.removePersistentDomain(forName: suiteName)
         store = DisplayLayoutStore(defaults: defaults)
     }
 
@@ -17,6 +18,7 @@ final class DisplayLayoutStoreTests: XCTestCase {
         defaults.removePersistentDomain(forName: suiteName)
         let plist = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Preferences/\(suiteName).plist")
+        CFPreferencesAppSynchronize(suiteName as CFString)
         try? FileManager.default.removeItem(at: plist)
         defaults = nil
         store = nil

@@ -10,7 +10,7 @@ final class ShortcutPersistenceTests: XCTestCase {
     private var preferences: AppPreferences!
 
     override func setUpWithError() throws {
-        suiteName = "PaneTests.\(UUID().uuidString)"
+        suiteName = "com.karunpai.Pane.PaneTests"
         defaults = try XCTUnwrap(UserDefaults(suiteName: suiteName))
         defaults.removePersistentDomain(forName: suiteName)
         store = ShortcutStore(defaults: defaults)
@@ -22,6 +22,7 @@ final class ShortcutPersistenceTests: XCTestCase {
         // removePersistentDomain leaves an empty plist behind; delete it too.
         let plist = FileManager.default.homeDirectoryForCurrentUser
             .appendingPathComponent("Library/Preferences/\(suiteName).plist")
+        CFPreferencesAppSynchronize(suiteName as CFString)
         try? FileManager.default.removeItem(at: plist)
         defaults = nil
         store = nil
