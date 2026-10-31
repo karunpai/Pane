@@ -9,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
     private var overlay: OverlayController!
     private var hotKeys: HotKeyManager!
     private var settings: SettingsWindowController?
+    private let displayShortcuts = DisplayShortcutController()
     private var statusMenu: NSMenu?
     private var accessibilityStatusItem: NSMenuItem?
     private var lastShortcutID: UUID?
@@ -17,6 +18,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         overlay = OverlayController(windowManager: windowManager)
+        displayShortcuts.start()
         setupStatusItem()
         setupHotKeys()
         NotificationCenter.default.addObserver(

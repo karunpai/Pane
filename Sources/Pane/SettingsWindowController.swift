@@ -1,7 +1,7 @@
 import AppKit
 import PaneCore
 
-/// The Settings window: a toolbar-style tab view (General, Appearance, Shortcuts).
+/// The Settings window: a toolbar-style tab view (General, Appearance, Shortcuts, Displays).
 /// Each tab sizes itself to its content via `preferredContentSize`, so the window
 /// grows and shrinks as the user switches tabs, like System Settings-era panes.
 final class SettingsWindowController: NSWindowController {
@@ -23,6 +23,7 @@ final class SettingsWindowController: NSWindowController {
         tabs.addTabViewItem(Self.tab(GeneralPreferencesViewController(), title: "General", symbol: "gearshape"))
         tabs.addTabViewItem(Self.tab(AppearancePreferencesViewController(), title: "Appearance", symbol: "paintbrush"))
         tabs.addTabViewItem(Self.tab(ShortcutsPreferencesViewController(), title: "Shortcuts", symbol: "keyboard"))
+        tabs.addTabViewItem(Self.tab(DisplaysPreferencesViewController(), title: "Displays", symbol: "display.2"))
         window.contentViewController = tabs
         self.init(window: window)
         if let size = tabs.tabViewItems.first?.viewController?.preferredContentSize { window.setContentSize(size) }

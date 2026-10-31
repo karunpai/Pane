@@ -25,5 +25,11 @@ fi
 
 git tag -a "$TAG" -m "Pane $VERSION"
 git push origin "$TAG"
-gh release create "$TAG" "$DMG" "$ZIP" --title "Pane $VERSION" --generate-notes
+# Release notes come from this version's section of CHANGELOG.md when there is one.
+NOTES="$(awk -v v="## $VERSION" '$0==v{f=1;next} /^## /{f=0} f' CHANGELOG.md 2>/dev/null || true)"
+if [[ -n "${NOTES//[[:space:]]/}" ]]; then
+  gh release create "$TAG" "$DMG" "$ZIP" --title "Pane $VERSION" --notes "$NOTES"
+else
+  gh release create "$TAG" "$DMG" "$ZIP" --title "Pane $VERSION" --generate-notes
+fi
 echo "==> Released Pane $VERSION"

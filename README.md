@@ -1,6 +1,6 @@
 # Pane
 
-Pane is a native Apple Silicon window manager for macOS 13+. Open the grid from the menu bar or a global shortcut, drag across cells, and the frontmost window snaps to that area. Save placements as global keyboard shortcuts.
+Pane is a native Apple Silicon window manager for macOS 13+. Open the grid from the menu bar or a global shortcut, drag across cells, and the frontmost window snaps to that area. Save placements as global keyboard shortcuts. When you plug in a monitor, double-tap a key to arrange your displays.
 
 ## Screenshots
 
@@ -15,6 +15,23 @@ Drag across the cells and the window snaps there; a live preview shows where it 
 | ![Shortcuts settings](docs/screenshots/settings-shortcuts.png) | ![General settings](docs/screenshots/settings-general.png) | ![Appearance settings](docs/screenshots/settings-appearance.png) |
 
 Screenshots are rendered by the app itself: `build/Pane.app/Contents/MacOS/Pane --snapshot-overlay docs/screenshots` (the overlay renders show a flat backdrop because the live blur can't be captured offscreen).
+
+## Display layouts
+
+Move your Mac between spots without opening Display Settings. After you plug in a monitor, double-tap a key within **1 minute**:
+
+| Double-tap | Layout |
+|---|---|
+| **⌥ Option** | **Mac on left**: Mac to the left of the monitor, bottom edges lined up |
+| **⌘ Command** | **Mac below**: Mac under the monitor, centered |
+
+A short message confirms the change. After the minute is up, double-taps do nothing until the next time a monitor is connected. Only the key on its own counts, so shortcuts like ⌘C never rearrange your displays. It works with any monitor.
+
+Change the layouts, add your own (left, right, above or below; top, center or bottom alignment; menu bar on the Mac or the monitor; Option, Command, Control or Shift), or try one with **Apply Now** in **Settings → Displays**. To turn it off, uncheck **Arrange displays when a monitor is connected**.
+
+From Terminal: `/Applications/Pane.app/Contents/MacOS/Pane --apply-layout "Mac below"`.
+
+![Displays settings](docs/screenshots/settings-displays.png)
 
 ## Download and install
 

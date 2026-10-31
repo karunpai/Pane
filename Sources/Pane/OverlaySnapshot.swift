@@ -53,7 +53,7 @@ enum OverlaySnapshot {
             window.orderFrontRegardless()
             for (appearance, suffix) in [(NSAppearance.Name.darkAqua, ""), (.aqua, "-light")] {
                 window.appearance = NSAppearance(named: appearance)
-                for (index, name) in ["general", "appearance", "shortcuts"].enumerated() {
+                for (index, name) in ["general", "appearance", "shortcuts", "displays"].enumerated() {
                     tabs.selectedTabViewItemIndex = index
                     RunLoop.current.run(until: Date().addingTimeInterval(0.6))
                     window.layoutIfNeeded()
@@ -79,6 +79,23 @@ enum OverlaySnapshot {
                 editor.display()
                 if let content = editor.contentView?.superview,
                    !write(content, to: directory.appendingPathComponent("settings-editor\(suffix).png"), appearance: nil) {
+                    status = 1
+                }
+            }
+            editor.orderOut(nil)
+        }
+        // The New/Edit Layout sheet (Displays tab). Building it never touches the displays.
+        if let editor = DisplayLayoutEditorWindowController.makeWindowForSnapshot() {
+            editor.setFrameOrigin(NSPoint(x: -20_000, y: -20_000))
+            editor.orderFrontRegardless()
+            editor.makeFirstResponder(nil)
+            for (appearance, suffix) in [(NSAppearance.Name.darkAqua, ""), (.aqua, "-light")] {
+                editor.appearance = NSAppearance(named: appearance)
+                RunLoop.current.run(until: Date().addingTimeInterval(0.3))
+                editor.layoutIfNeeded()
+                editor.display()
+                if let content = editor.contentView?.superview,
+                   !write(content, to: directory.appendingPathComponent("settings-display-editor\(suffix).png"), appearance: nil) {
                     status = 1
                 }
             }
